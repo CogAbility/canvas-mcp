@@ -139,89 +139,89 @@ function generateCanvasStyleguide(includeExamples: boolean = true, customBrandin
 
 export function registerPageTools(server: any, canvas: CanvasClient) {
   // Tool: generate-styleguide
-  server.tool(
-    "generate-styleguide",
-    "🎨 FOUNDATION TOOL: Generate and save a comprehensive Canvas styleguide page that serves as the formatting foundation for ALL course pages. This creates design standards, accessibility guidelines, and Canvas-specific best practices. ALWAYS create this FIRST before working with any other page content to ensure professional consistency!",
-    {
-      courseId: z.string().describe("The ID of the course where the styleguide will be saved"),
-      includeExamples: z.boolean().default(true).describe("Whether to include visual examples of each style element"),
-      customBranding: z.string().optional().describe("Optional custom branding guidelines or color schemes to incorporate"),
-      slug: z.string().default(DEFAULT_STYLEGUIDE_SLUG).describe("Custom URL slug for the styleguide page")
-    },
-    async ({ courseId, includeExamples = true, customBranding, slug = DEFAULT_STYLEGUIDE_SLUG }: { courseId: string; includeExamples?: boolean; customBranding?: string; slug?: string }) => {
-      try {
-        const styleguideContent = generateCanvasStyleguide(includeExamples, customBranding);
+  // server.tool(
+  //   "generate-styleguide",
+  //   "🎨 FOUNDATION TOOL: Generate and save a comprehensive Canvas styleguide page that serves as the formatting foundation for ALL course pages. This creates design standards, accessibility guidelines, and Canvas-specific best practices. ALWAYS create this FIRST before working with any other page content to ensure professional consistency!",
+  //   {
+  //     courseId: z.string().describe("The ID of the course where the styleguide will be saved"),
+  //     includeExamples: z.boolean().default(true).describe("Whether to include visual examples of each style element"),
+  //     customBranding: z.string().optional().describe("Optional custom branding guidelines or color schemes to incorporate"),
+  //     slug: z.string().default(DEFAULT_STYLEGUIDE_SLUG).describe("Custom URL slug for the styleguide page")
+  //   },
+  //   async ({ courseId, includeExamples = true, customBranding, slug = DEFAULT_STYLEGUIDE_SLUG }: { courseId: string; includeExamples?: boolean; customBranding?: string; slug?: string }) => {
+  //     try {
+  //       const styleguideContent = generateCanvasStyleguide(includeExamples, customBranding);
         
-        const styleguide = (await canvas.updateOrCreatePage(courseId, slug, {
-          wiki_page: {
-            title: 'Canvas Course Styleguide',
-            body: styleguideContent
-          }
-        }) as any);
+  //       const styleguide = (await canvas.updateOrCreatePage(courseId, slug, {
+  //         wiki_page: {
+  //           title: 'Canvas Course Styleguide',
+  //           body: styleguideContent
+  //         }
+  //       }) as any);
 
-        return {
-          content: [
-            {
-              type: "text",
-              text: [
-                `✅ Canvas styleguide created successfully!`,
-                `Page URL: ${styleguide.url}`,
-                `Course ID: ${courseId}`,
-                ``,
-                `This styleguide will now be automatically referenced by all page creation and editing tools to ensure consistent formatting.`,
-                ``,
-                `🔗 View at: ${process.env.CANVAS_BASE_URL || 'https://fhict.instructure.com'}/courses/${courseId}/pages/${styleguide.url}`
-              ].join('\n')
-            }
-          ]
-        };
-      } catch (error: any) {
-        if (error instanceof Error) {
-          throw new Error(`Failed to generate styleguide: ${error.message}`);
-        }
-        throw new Error('Failed to generate styleguide: Unknown error');
-      }
-    }
-  );
+  //       return {
+  //         content: [
+  //           {
+  //             type: "text",
+  //             text: [
+  //               `✅ Canvas styleguide created successfully!`,
+  //               `Page URL: ${styleguide.url}`,
+  //               `Course ID: ${courseId}`,
+  //               ``,
+  //               `This styleguide will now be automatically referenced by all page creation and editing tools to ensure consistent formatting.`,
+  //               ``,
+  //               `🔗 View at: ${process.env.CANVAS_BASE_URL || 'https://fhict.instructure.com'}/courses/${courseId}/pages/${styleguide.url}`
+  //             ].join('\n')
+  //           }
+  //         ]
+  //       };
+  //     } catch (error: any) {
+  //       if (error instanceof Error) {
+  //         throw new Error(`Failed to generate styleguide: ${error.message}`);
+  //       }
+  //       throw new Error('Failed to generate styleguide: Unknown error');
+  //     }
+  //   }
+  // );
 
   // Tool: get-styleguide
-  server.tool(
-    "get-styleguide",
-    "📋 ESSENTIAL: Fetch the Canvas styleguide for a course to reference during page creation or editing. This is CRITICAL for maintaining consistency with established design standards. Always use this before creating or modifying any page content!",
-    {
-      courseId: z.string().describe("The ID of the course"),
-      slug: z.string().default(DEFAULT_STYLEGUIDE_SLUG).describe("URL slug of the styleguide page")
-    },
-    async ({ courseId, slug = DEFAULT_STYLEGUIDE_SLUG }: { courseId: string; slug?: string }) => {
-      try {
-        const styleguide = (await canvas.getPage(courseId, slug) as any);
+  // server.tool(
+  //   "get-styleguide",
+  //   "📋 ESSENTIAL: Fetch the Canvas styleguide for a course to reference during page creation or editing. This is CRITICAL for maintaining consistency with established design standards. Always use this before creating or modifying any page content!",
+  //   {
+  //     courseId: z.string().describe("The ID of the course"),
+  //     slug: z.string().default(DEFAULT_STYLEGUIDE_SLUG).describe("URL slug of the styleguide page")
+  //   },
+  //   async ({ courseId, slug = DEFAULT_STYLEGUIDE_SLUG }: { courseId: string; slug?: string }) => {
+  //     try {
+  //       const styleguide = (await canvas.getPage(courseId, slug) as any);
         
-        return {
-          content: [
-            {
-              type: "text",
-              text: [
-                `📋 Canvas Styleguide for Course ${courseId}:`,
-                `Title: ${styleguide.title}`,
-                `Last Updated: ${styleguide.updated_at}`,
-                ``,
-                `--- STYLEGUIDE CONTENT ---`,
-                styleguide.body || 'No styleguide content found',
-                `--- END STYLEGUIDE ---`,
-                ``,
-                `Use this styleguide to ensure all page content follows consistent formatting and design standards.`
-              ].join('\n')
-            }
-          ]
-        };
-      } catch (error: any) {
-        if (error instanceof Error) {
-          throw new Error(`Failed to fetch styleguide: ${error.message} (Create one first using generate-styleguide)`);
-        }
-        throw new Error('Failed to fetch styleguide: Unknown error');
-      }
-    }
-  );
+  //       return {
+  //         content: [
+  //           {
+  //             type: "text",
+  //             text: [
+  //               `📋 Canvas Styleguide for Course ${courseId}:`,
+  //               `Title: ${styleguide.title}`,
+  //               `Last Updated: ${styleguide.updated_at}`,
+  //               ``,
+  //               `--- STYLEGUIDE CONTENT ---`,
+  //               styleguide.body || 'No styleguide content found',
+  //               `--- END STYLEGUIDE ---`,
+  //               ``,
+  //               `Use this styleguide to ensure all page content follows consistent formatting and design standards.`
+  //             ].join('\n')
+  //           }
+  //         ]
+  //       };
+  //     } catch (error: any) {
+  //       if (error instanceof Error) {
+  //         throw new Error(`Failed to fetch styleguide: ${error.message} (Create one first using generate-styleguide)`);
+  //       }
+  //       throw new Error('Failed to fetch styleguide: Unknown error');
+  //     }
+  //   }
+  // );
 
   // Tool: list-pages
   server.tool(
@@ -304,279 +304,279 @@ export function registerPageTools(server: any, canvas: CanvasClient) {
   );
 
   // Tool: update-page-content
-  server.tool(
-    "update-page-content",
-    "🎨 STYLEGUIDE-AWARE FULL REPLACEMENT: Update or create a page with completely new content that automatically follows the course styleguide standards. Use this when you have the entire new HTML body ready, or when creating pages from scratch. For small edits to existing content, use patch-page-content instead. ALWAYS references course styleguide for consistency unless explicitly disabled.",
-    {
-      courseId: z.string().describe("The ID of the course"),
-      pageUrl: z.string().describe("The page's URL slug (e.g., 'syllabus')"),
-      title: z.string().optional().describe("The new title for the page (optional)"),
-      body: z.string().optional().describe("The new HTML body for the page (optional)"),
-      editingRoles: z.string().optional().describe("Comma-separated roles allowed to edit (optional)"),
-      ignoreStyleguide: z.boolean().default(false).describe("Skip styleguide reference (not recommended)"),
-      showStyleguidePreview: z.boolean().default(true).describe("Show styleguide preview when creating content from scratch")
-    },
-    async ({ courseId, pageUrl, title, body, editingRoles, ignoreStyleguide = false, showStyleguidePreview = true }: { 
-      courseId: string; 
-      pageUrl: string; 
-      title?: string; 
-      body?: string; 
-      editingRoles?: string;
-      ignoreStyleguide?: boolean;
-      showStyleguidePreview?: boolean;
-    }) => {
-      try {
-        // If creating content from scratch and no body provided, show styleguide for reference
-        if (!body && showStyleguidePreview && !ignoreStyleguide) {
-          try {
-            const styleguide = (await canvas.getPage(courseId, DEFAULT_STYLEGUIDE_SLUG) as any);
-            return {
-              content: [
-                {
-                  type: "text",
-                  text: [
-                    `Creating new page '${pageUrl}' in course ${courseId}`,
-                    `Title: ${title || 'Not specified'}`,
-                    '',
-                    '--- COURSE STYLEGUIDE FOR REFERENCE ---',
-                    styleguide.body || 'No styleguide content found',
-                    '--- END STYLEGUIDE ---',
-                    '',
-                    'Please create the page content following the above styleguide standards for consistency.',
-                    'Use update-page-content again with the body parameter containing your HTML content.'
-                  ].join('\n')
-                }
-              ]
-            };
-          } catch (error) {
-            // Styleguide not found, continue with normal operation
-          }
-        }
+  // server.tool(
+  //   "update-page-content",
+  //   "🎨 STYLEGUIDE-AWARE FULL REPLACEMENT: Update or create a page with completely new content that automatically follows the course styleguide standards. Use this when you have the entire new HTML body ready, or when creating pages from scratch. For small edits to existing content, use patch-page-content instead. ALWAYS references course styleguide for consistency unless explicitly disabled.",
+  //   {
+  //     courseId: z.string().describe("The ID of the course"),
+  //     pageUrl: z.string().describe("The page's URL slug (e.g., 'syllabus')"),
+  //     title: z.string().optional().describe("The new title for the page (optional)"),
+  //     body: z.string().optional().describe("The new HTML body for the page (optional)"),
+  //     editingRoles: z.string().optional().describe("Comma-separated roles allowed to edit (optional)"),
+  //     ignoreStyleguide: z.boolean().default(false).describe("Skip styleguide reference (not recommended)"),
+  //     showStyleguidePreview: z.boolean().default(true).describe("Show styleguide preview when creating content from scratch")
+  //   },
+  //   async ({ courseId, pageUrl, title, body, editingRoles, ignoreStyleguide = false, showStyleguidePreview = true }: { 
+  //     courseId: string; 
+  //     pageUrl: string; 
+  //     title?: string; 
+  //     body?: string; 
+  //     editingRoles?: string;
+  //     ignoreStyleguide?: boolean;
+  //     showStyleguidePreview?: boolean;
+  //   }) => {
+  //     try {
+  //       // If creating content from scratch and no body provided, show styleguide for reference
+  //       if (!body && showStyleguidePreview && !ignoreStyleguide) {
+  //         try {
+  //           const styleguide = (await canvas.getPage(courseId, DEFAULT_STYLEGUIDE_SLUG) as any);
+  //           return {
+  //             content: [
+  //               {
+  //                 type: "text",
+  //                 text: [
+  //                   `Creating new page '${pageUrl}' in course ${courseId}`,
+  //                   `Title: ${title || 'Not specified'}`,
+  //                   '',
+  //                   '--- COURSE STYLEGUIDE FOR REFERENCE ---',
+  //                   styleguide.body || 'No styleguide content found',
+  //                   '--- END STYLEGUIDE ---',
+  //                   '',
+  //                   'Please create the page content following the above styleguide standards for consistency.',
+  //                   'Use update-page-content again with the body parameter containing your HTML content.'
+  //                 ].join('\n')
+  //               }
+  //             ]
+  //           };
+  //         } catch (error) {
+  //           // Styleguide not found, continue with normal operation
+  //         }
+  //       }
 
-        const wiki_page: any = {};
-        if (title !== undefined) wiki_page.title = title;
-        if (body !== undefined) wiki_page.body = body;
-        if (editingRoles !== undefined) wiki_page.editing_roles = editingRoles;
+  //       const wiki_page: any = {};
+  //       if (title !== undefined) wiki_page.title = title;
+  //       if (body !== undefined) wiki_page.body = body;
+  //       if (editingRoles !== undefined) wiki_page.editing_roles = editingRoles;
         
-        const page = (await canvas.updateOrCreatePage(courseId, pageUrl, { wiki_page }) as any);
+  //       const page = (await canvas.updateOrCreatePage(courseId, pageUrl, { wiki_page }) as any);
         
-        return {
-          content: [
-            {
-              type: "text",
-              text: [
-                `✅ Page '${page.url}' updated in course ${courseId}.`,
-                `Title: ${page.title}`,
-                `ID: ${page.page_id}`,
-                `Published: ${page.published ? 'Yes' : 'No'}`,
-                `Updated At: ${page.updated_at}`,
-                '',
-                `💡 Tip: Content follows course styleguide standards for consistency.`
-              ].join('\n')
-            }
-          ]
-        };
-      } catch (error: any) {
-        if (error instanceof Error) {
-          throw new Error(`Failed to update page: ${error.message}`);
-        }
-        throw new Error('Failed to update page: Unknown error');
-      }
-    }
-  );
+  //       return {
+  //         content: [
+  //           {
+  //             type: "text",
+  //             text: [
+  //               `✅ Page '${page.url}' updated in course ${courseId}.`,
+  //               `Title: ${page.title}`,
+  //               `ID: ${page.page_id}`,
+  //               `Published: ${page.published ? 'Yes' : 'No'}`,
+  //               `Updated At: ${page.updated_at}`,
+  //               '',
+  //               `💡 Tip: Content follows course styleguide standards for consistency.`
+  //             ].join('\n')
+  //           }
+  //         ]
+  //       };
+  //     } catch (error: any) {
+  //       if (error instanceof Error) {
+  //         throw new Error(`Failed to update page: ${error.message}`);
+  //       }
+  //       throw new Error('Failed to update page: Unknown error');
+  //     }
+  //   }
+  // );
 
   // Tool: list-page-revisions
-  server.tool(
-    "list-page-revisions",
-    "List all revisions for a page.",
-    {
-      courseId: z.string().describe("The ID of the course"),
-      pageUrl: z.string().describe("The page's URL slug (e.g., 'syllabus')")
-    },
-    async ({ courseId, pageUrl }: { courseId: string; pageUrl: string }) => {
-      try {
-        const revisions = (await canvas.listPageRevisions(courseId, pageUrl) as any[]);
-        const formatted = revisions.map((rev: any) => [
-          `Revision ID: ${rev.id}`,
-          `Updated At: ${rev.updated_at}`,
-          `Edited By: ${rev.edited_by?.display_name || rev.edited_by_id || 'Unknown'}`,
-          '---'
-        ].join('\n')).join('\n');
-        return {
-          content: [
-            {
-              type: "text",
-              text: revisions.length > 0 ? `Revisions for page '${pageUrl}' in course ${courseId}:\n\n${formatted}` : "No revisions found for this page."
-            }
-          ]
-        };
-      } catch (error: any) {
-        if (error instanceof Error) {
-          throw new Error(`Failed to fetch page revisions: ${error.message}`);
-        }
-        throw new Error('Failed to fetch page revisions: Unknown error');
-      }
-    }
-  );
+  // server.tool(
+  //   "list-page-revisions",
+  //   "List all revisions for a page.",
+  //   {
+  //     courseId: z.string().describe("The ID of the course"),
+  //     pageUrl: z.string().describe("The page's URL slug (e.g., 'syllabus')")
+  //   },
+  //   async ({ courseId, pageUrl }: { courseId: string; pageUrl: string }) => {
+  //     try {
+  //       const revisions = (await canvas.listPageRevisions(courseId, pageUrl) as any[]);
+  //       const formatted = revisions.map((rev: any) => [
+  //         `Revision ID: ${rev.id}`,
+  //         `Updated At: ${rev.updated_at}`,
+  //         `Edited By: ${rev.edited_by?.display_name || rev.edited_by_id || 'Unknown'}`,
+  //         '---'
+  //       ].join('\n')).join('\n');
+  //       return {
+  //         content: [
+  //           {
+  //             type: "text",
+  //             text: revisions.length > 0 ? `Revisions for page '${pageUrl}' in course ${courseId}:\n\n${formatted}` : "No revisions found for this page."
+  //           }
+  //         ]
+  //       };
+  //     } catch (error: any) {
+  //       if (error instanceof Error) {
+  //         throw new Error(`Failed to fetch page revisions: ${error.message}`);
+  //       }
+  //       throw new Error('Failed to fetch page revisions: Unknown error');
+  //     }
+  //   }
+  // );
 
   // Tool: revert-page-revision
-  server.tool(
-    "revert-page-revision",
-    "Revert a page to a previous revision.",
-    {
-      courseId: z.string().describe("The ID of the course"),
-      pageUrl: z.string().describe("The page's URL slug (e.g., 'syllabus')"),
-      revisionId: z.string().describe("The ID of the revision to revert to")
-    },
-    async ({ courseId, pageUrl, revisionId }: { courseId: string; pageUrl: string; revisionId: string }) => {
-      try {
-        const page = (await canvas.revertPageRevision(courseId, pageUrl, revisionId) as any);
-        return {
-          content: [
-            {
-              type: "text",
-              text: [
-                `Page '${pageUrl}' in course ${courseId} reverted to revision ${revisionId}.`,
-                `Title: ${page.title}`,
-                `ID: ${page.page_id}`,
-                `Published: ${page.published ? 'Yes' : 'No'}`,
-                `Updated At: ${page.updated_at}`
-              ].join('\n')
-            }
-          ]
-        };
-      } catch (error: any) {
-        if (error instanceof Error) {
-          throw new Error(`Failed to revert page revision: ${error.message}`);
-        }
-        throw new Error('Failed to revert page revision: Unknown error');
-      }
-    }
-  );
+  // server.tool(
+  //   "revert-page-revision",
+  //   "Revert a page to a previous revision.",
+  //   {
+  //     courseId: z.string().describe("The ID of the course"),
+  //     pageUrl: z.string().describe("The page's URL slug (e.g., 'syllabus')"),
+  //     revisionId: z.string().describe("The ID of the revision to revert to")
+  //   },
+  //   async ({ courseId, pageUrl, revisionId }: { courseId: string; pageUrl: string; revisionId: string }) => {
+  //     try {
+  //       const page = (await canvas.revertPageRevision(courseId, pageUrl, revisionId) as any);
+  //       return {
+  //         content: [
+  //           {
+  //             type: "text",
+  //             text: [
+  //               `Page '${pageUrl}' in course ${courseId} reverted to revision ${revisionId}.`,
+  //               `Title: ${page.title}`,
+  //               `ID: ${page.page_id}`,
+  //               `Published: ${page.published ? 'Yes' : 'No'}`,
+  //               `Updated At: ${page.updated_at}`
+  //             ].join('\n')
+  //           }
+  //         ]
+  //       };
+  //     } catch (error: any) {
+  //       if (error instanceof Error) {
+  //         throw new Error(`Failed to revert page revision: ${error.message}`);
+  //       }
+  //       throw new Error('Failed to revert page revision: Unknown error');
+  //     }
+  //   }
+  // );
 
   // Tool: patch-page-content
-  server.tool(
-    "patch-page-content",
-    "🎨 STYLEGUIDE-COMPLIANT SMART EDITING: Make targeted changes to existing page content using LLM assistance while maintaining course styleguide standards. Give natural language instructions (e.g., 'fix typos', 'update office hours', 'add exam warning'). This is STEP 1 of a 2-step process - use apply-page-changes after reviewing the LLM's modifications. For complete content replacement, use update-page-content instead. ALWAYS references course styleguide for formatting consistency.",
-    {
-      courseId: z.string().describe("The ID of the course"),
-      pageUrl: z.string().describe("The page's URL slug (e.g., 'syllabus')"),
-      instructions: z.string().describe("Natural language instructions for what changes to make to the page content (e.g., 'Update office hours to 2-4pm on MWF', 'Add a warning about the upcoming exam', 'Fix all typos')"),
-      title: z.string().optional().describe("New title for the page (optional)"),
-      editingRoles: z.string().optional().describe("Comma-separated roles allowed to edit (optional)"),
-      ignoreStyleguide: z.boolean().default(false).describe("Skip styleguide reference (not recommended)")
-    },
-    async ({ courseId, pageUrl, instructions, title, editingRoles, ignoreStyleguide = false }: { 
-      courseId: string; 
-      pageUrl: string; 
-      instructions: string;
-      title?: string;
-      editingRoles?: string;
-      ignoreStyleguide?: boolean;
-    }) => {
-      try {
-        // Fetch the current page content
-        const currentPage = (await canvas.getPage(courseId, pageUrl) as any);
-        const currentBody = currentPage.body || '';
+//   server.tool(
+//     "patch-page-content",
+//     "🎨 STYLEGUIDE-COMPLIANT SMART EDITING: Make targeted changes to existing page content using LLM assistance while maintaining course styleguide standards. Give natural language instructions (e.g., 'fix typos', 'update office hours', 'add exam warning'). This is STEP 1 of a 2-step process - use apply-page-changes after reviewing the LLM's modifications. For complete content replacement, use update-page-content instead. ALWAYS references course styleguide for formatting consistency.",
+//     {
+//       courseId: z.string().describe("The ID of the course"),
+//       pageUrl: z.string().describe("The page's URL slug (e.g., 'syllabus')"),
+//       instructions: z.string().describe("Natural language instructions for what changes to make to the page content (e.g., 'Update office hours to 2-4pm on MWF', 'Add a warning about the upcoming exam', 'Fix all typos')"),
+//       title: z.string().optional().describe("New title for the page (optional)"),
+//       editingRoles: z.string().optional().describe("Comma-separated roles allowed to edit (optional)"),
+//       ignoreStyleguide: z.boolean().default(false).describe("Skip styleguide reference (not recommended)")
+//     },
+//     async ({ courseId, pageUrl, instructions, title, editingRoles, ignoreStyleguide = false }: { 
+//       courseId: string; 
+//       pageUrl: string; 
+//       instructions: string;
+//       title?: string;
+//       editingRoles?: string;
+//       ignoreStyleguide?: boolean;
+//     }) => {
+//       try {
+//         // Fetch the current page content
+//         const currentPage = (await canvas.getPage(courseId, pageUrl) as any);
+//         const currentBody = currentPage.body || '';
 
-        // Try to fetch styleguide unless explicitly ignored
-        let styleguideContext = '';
-        if (!ignoreStyleguide) {
-          try {
-            const styleguide = (await canvas.getPage(courseId, DEFAULT_STYLEGUIDE_SLUG) as any);
-            styleguideContext = `
+//         // Try to fetch styleguide unless explicitly ignored
+//         let styleguideContext = '';
+//         if (!ignoreStyleguide) {
+//           try {
+//             const styleguide = (await canvas.getPage(courseId, DEFAULT_STYLEGUIDE_SLUG) as any);
+//             styleguideContext = `
 
---- COURSE STYLEGUIDE STANDARDS ---
-${styleguide.body}
---- END STYLEGUIDE ---
+// --- COURSE STYLEGUIDE STANDARDS ---
+// ${styleguide.body}
+// --- END STYLEGUIDE ---
 
-IMPORTANT: When making changes, ensure all formatting follows the above styleguide standards for consistency.`;
-          } catch (error) {
-            styleguideContext = '\n\n⚠️ No course styleguide found. Consider creating one with generate-styleguide for consistent formatting.';
-          }
-        }
+// IMPORTANT: When making changes, ensure all formatting follows the above styleguide standards for consistency.`;
+//           } catch (error) {
+//             styleguideContext = '\n\n⚠️ No course styleguide found. Consider creating one with generate-styleguide for consistent formatting.';
+//           }
+//         }
 
-        return {
-          content: [
-            {
-              type: "text",
-              text: [
-                `Current page content for '${pageUrl}' in course ${courseId}:`,
-                `Title: ${currentPage.title}`,
-                `Published: ${currentPage.published ? 'Yes' : 'No'}`,
-                '',
-                '--- CURRENT CONTENT ---',
-                currentBody,
-                '--- END CURRENT CONTENT ---',
-                styleguideContext,
-                '',
-                `Instructions: ${instructions}`,
-                '',
-                'Please modify the above HTML content according to the instructions. Follow the styleguide standards for consistency. Respond with ONLY the modified HTML content that should replace the current body. Preserve the existing structure and formatting unless the instructions specifically ask to change it.',
-                '',
-                'After you provide the modified content, I will update the page automatically.'
-              ].join('\n')
-            }
-          ]
-        };
-      } catch (error: any) {
-        if (error instanceof Error) {
-          throw new Error(`Failed to fetch page for patching: ${error.message}`);
-        }
-        throw new Error('Failed to fetch page for patching: Unknown error');
-      }
-    }
-  );
+//         return {
+//           content: [
+//             {
+//               type: "text",
+//               text: [
+//                 `Current page content for '${pageUrl}' in course ${courseId}:`,
+//                 `Title: ${currentPage.title}`,
+//                 `Published: ${currentPage.published ? 'Yes' : 'No'}`,
+//                 '',
+//                 '--- CURRENT CONTENT ---',
+//                 currentBody,
+//                 '--- END CURRENT CONTENT ---',
+//                 styleguideContext,
+//                 '',
+//                 `Instructions: ${instructions}`,
+//                 '',
+//                 'Please modify the above HTML content according to the instructions. Follow the styleguide standards for consistency. Respond with ONLY the modified HTML content that should replace the current body. Preserve the existing structure and formatting unless the instructions specifically ask to change it.',
+//                 '',
+//                 'After you provide the modified content, I will update the page automatically.'
+//               ].join('\n')
+//             }
+//           ]
+//         };
+//       } catch (error: any) {
+//         if (error instanceof Error) {
+//           throw new Error(`Failed to fetch page for patching: ${error.message}`);
+//         }
+//         throw new Error('Failed to fetch page for patching: Unknown error');
+//       }
+//     }
+//   );
 
   // Tool: apply-page-changes
-  server.tool(
-    "apply-page-changes",
-    "🎨 STEP 2: Apply styleguide-compliant LLM-generated page modifications. Use this after patch-page-content shows you the proposed changes. This completes the smart editing workflow by actually updating the Canvas page with the reviewed modifications that follow course formatting standards.",
-    {
-      courseId: z.string().describe("The ID of the course"),
-      pageUrl: z.string().describe("The page's URL slug (e.g., 'syllabus')"),
-      newContent: z.string().describe("The new HTML content for the page body"),
-      title: z.string().optional().describe("New title for the page (optional)"),
-      editingRoles: z.string().optional().describe("Comma-separated roles allowed to edit (optional)")
-    },
-    async ({ courseId, pageUrl, newContent, title, editingRoles }: { 
-      courseId: string; 
-      pageUrl: string; 
-      newContent: string;
-      title?: string;
-      editingRoles?: string;
-    }) => {
-      try {
-        // Prepare the update payload
-        const wiki_page: any = { body: newContent };
-        if (title !== undefined) wiki_page.title = title;
-        if (editingRoles !== undefined) wiki_page.editing_roles = editingRoles;
+  // server.tool(
+  //   "apply-page-changes",
+  //   "🎨 STEP 2: Apply styleguide-compliant LLM-generated page modifications. Use this after patch-page-content shows you the proposed changes. This completes the smart editing workflow by actually updating the Canvas page with the reviewed modifications that follow course formatting standards.",
+  //   {
+  //     courseId: z.string().describe("The ID of the course"),
+  //     pageUrl: z.string().describe("The page's URL slug (e.g., 'syllabus')"),
+  //     newContent: z.string().describe("The new HTML content for the page body"),
+  //     title: z.string().optional().describe("New title for the page (optional)"),
+  //     editingRoles: z.string().optional().describe("Comma-separated roles allowed to edit (optional)")
+  //   },
+  //   async ({ courseId, pageUrl, newContent, title, editingRoles }: { 
+  //     courseId: string; 
+  //     pageUrl: string; 
+  //     newContent: string;
+  //     title?: string;
+  //     editingRoles?: string;
+  //   }) => {
+  //     try {
+  //       // Prepare the update payload
+  //       const wiki_page: any = { body: newContent };
+  //       if (title !== undefined) wiki_page.title = title;
+  //       if (editingRoles !== undefined) wiki_page.editing_roles = editingRoles;
 
-        // Update the page
-        const updatedPage = (await canvas.updateOrCreatePage(courseId, pageUrl, { wiki_page }) as any);
+  //       // Update the page
+  //       const updatedPage = (await canvas.updateOrCreatePage(courseId, pageUrl, { wiki_page }) as any);
 
-        return {
-          content: [
-            {
-              type: "text",
-              text: [
-                `✅ Page '${updatedPage.url}' successfully updated in course ${courseId}!`,
-                `Title: ${updatedPage.title}`,
-                `ID: ${updatedPage.page_id}`,
-                `Published: ${updatedPage.published ? 'Yes' : 'No'}`,
-                `Updated At: ${updatedPage.updated_at}`,
-                '',
-                '🎨 The changes have been applied successfully with course styleguide compliance maintained.'
-              ].join('\n')
-            }
-          ]
-        };
-      } catch (error: any) {
-        if (error instanceof Error) {
-          throw new Error(`Failed to apply page changes: ${error.message}`);
-        }
-        throw new Error('Failed to apply page changes: Unknown error');
-      }
-    }
-  );
+  //       return {
+  //         content: [
+  //           {
+  //             type: "text",
+  //             text: [
+  //               `✅ Page '${updatedPage.url}' successfully updated in course ${courseId}!`,
+  //               `Title: ${updatedPage.title}`,
+  //               `ID: ${updatedPage.page_id}`,
+  //               `Published: ${updatedPage.published ? 'Yes' : 'No'}`,
+  //               `Updated At: ${updatedPage.updated_at}`,
+  //               '',
+  //               '🎨 The changes have been applied successfully with course styleguide compliance maintained.'
+  //             ].join('\n')
+  //           }
+  //         ]
+  //       };
+  //     } catch (error: any) {
+  //       if (error instanceof Error) {
+  //         throw new Error(`Failed to apply page changes: ${error.message}`);
+  //       }
+  //       throw new Error('Failed to apply page changes: Unknown error');
+  //     }
+  //   }
+  // );
 } 

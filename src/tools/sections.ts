@@ -68,85 +68,85 @@ export function registerSectionTools(server: any, canvas: CanvasClient) {
   );
 
   // Tool: list-section-submissions
-  server.tool(
-    "list-section-submissions",
-    "Get all student submissions for a specific assignment filtered by section",
-    {
-      courseId: z.string().describe("The ID of the course"),
-      assignmentId: z.string().describe("The ID of the assignment"),
-      sectionId: z.string().describe("The ID of the section"),
-      includeComments: z.boolean().default(true).describe("Whether to include submission comments"),
-      anonymous: z.boolean().default(true).describe("Whether to anonymize student names and emails (default: true for privacy)")
-    },
-    async ({ courseId, assignmentId, sectionId, includeComments = true, anonymous = true }: { courseId: string; assignmentId: string; sectionId: string; includeComments?: boolean; anonymous?: boolean }) => {
-      let submissions: any[] = [];
-      let page = 1;
-      let hasMore = true;
-      try {
-        await canvas.getSection(courseId, sectionId);
+  // server.tool(
+  //   "list-section-submissions",
+  //   "Get all student submissions for a specific assignment filtered by section",
+  //   {
+  //     courseId: z.string().describe("The ID of the course"),
+  //     assignmentId: z.string().describe("The ID of the assignment"),
+  //     sectionId: z.string().describe("The ID of the section"),
+  //     includeComments: z.boolean().default(true).describe("Whether to include submission comments"),
+  //     anonymous: z.boolean().default(true).describe("Whether to anonymize student names and emails (default: true for privacy)")
+  //   },
+  //   async ({ courseId, assignmentId, sectionId, includeComments = true, anonymous = true }: { courseId: string; assignmentId: string; sectionId: string; includeComments?: boolean; anonymous?: boolean }) => {
+  //     let submissions: any[] = [];
+  //     let page = 1;
+  //     let hasMore = true;
+  //     try {
+  //       await canvas.getSection(courseId, sectionId);
 
-        while (hasMore) {
-          const params: any = {
-            per_page: 100,
-            page: page,
-            include: [
-              'user',
-              'submission_comments',
-              'assignment'
-            ]
-          };
-          const pageSubmissions = (await canvas.listSectionAssignmentSubmissions(sectionId, assignmentId, params, { anonymous }) as any[]);
-          submissions.push(...pageSubmissions);
-          hasMore = pageSubmissions.length === 100;
-          page += 1;
-        }
-        const formattedSubmissions = submissions
-          .map(submission => {
-            const parts = [
-              `Student: ${submission.user?.name || 'Unknown'}`,
-              `Status: ${submission.workflow_state}`,
-              `Submitted: ${submission.submitted_at ? new Date(submission.submitted_at).toLocaleString() : 'Not submitted'}`,
-              `Grade: ${submission.grade || 'No grade'}`,
-              `Score: ${submission.score !== undefined ? submission.score : 'No score'}`
-            ];
-            if (submission.late) {
-              parts.push('Late: Yes');
-            }
-            if (submission.missing) {
-              parts.push('Missing: Yes');
-            }
-            if (submission.submission_type) {
-              parts.push(`Submission Type: ${submission.submission_type}`);
-            }
-            if (includeComments && submission.submission_comments?.length > 0) {
-              parts.push('\nComments:');
-              submission.submission_comments.forEach((comment: any) => {
-                const date = new Date(comment.created_at).toLocaleString();
-                const author = comment.author?.display_name || 'Unknown';
-                const role = comment.author?.role || 'unknown role';
-                parts.push(`  [${date}] ${author} (${role}):`);
-                parts.push(`    ${comment.comment}`);
-              });
-            }
-            return parts.join('\n');
-          })
-          .join('\n---\n');
-        return {
-          content: [
-            {
-              type: "text",
-              text: submissions.length > 0
-                ? `Submissions for assignment ${assignmentId} in section ${sectionId}:\n\n${formattedSubmissions}\n\nTotal submissions: ${submissions.length}`
-                : "No submissions found for this assignment in this section.",
-            },
-          ],
-        };
-      } catch (error: any) {
-        if (error instanceof Error) {
-          throw new Error(`Failed to fetch section submissions: ${error.message}`);
-        }
-        throw new Error('Failed to fetch section submissions: Unknown error');
-      }
-    }
-  );
+  //       while (hasMore) {
+  //         const params: any = {
+  //           per_page: 100,
+  //           page: page,
+  //           include: [
+  //             'user',
+  //             'submission_comments',
+  //             'assignment'
+  //           ]
+  //         };
+  //         const pageSubmissions = (await canvas.listSectionAssignmentSubmissions(sectionId, assignmentId, params, { anonymous }) as any[]);
+  //         submissions.push(...pageSubmissions);
+  //         hasMore = pageSubmissions.length === 100;
+  //         page += 1;
+  //       }
+  //       const formattedSubmissions = submissions
+  //         .map(submission => {
+  //           const parts = [
+  //             `Student: ${submission.user?.name || 'Unknown'}`,
+  //             `Status: ${submission.workflow_state}`,
+  //             `Submitted: ${submission.submitted_at ? new Date(submission.submitted_at).toLocaleString() : 'Not submitted'}`,
+  //             `Grade: ${submission.grade || 'No grade'}`,
+  //             `Score: ${submission.score !== undefined ? submission.score : 'No score'}`
+  //           ];
+  //           if (submission.late) {
+  //             parts.push('Late: Yes');
+  //           }
+  //           if (submission.missing) {
+  //             parts.push('Missing: Yes');
+  //           }
+  //           if (submission.submission_type) {
+  //             parts.push(`Submission Type: ${submission.submission_type}`);
+  //           }
+  //           if (includeComments && submission.submission_comments?.length > 0) {
+  //             parts.push('\nComments:');
+  //             submission.submission_comments.forEach((comment: any) => {
+  //               const date = new Date(comment.created_at).toLocaleString();
+  //               const author = comment.author?.display_name || 'Unknown';
+  //               const role = comment.author?.role || 'unknown role';
+  //               parts.push(`  [${date}] ${author} (${role}):`);
+  //               parts.push(`    ${comment.comment}`);
+  //             });
+  //           }
+  //           return parts.join('\n');
+  //         })
+  //         .join('\n---\n');
+  //       return {
+  //         content: [
+  //           {
+  //             type: "text",
+  //             text: submissions.length > 0
+  //               ? `Submissions for assignment ${assignmentId} in section ${sectionId}:\n\n${formattedSubmissions}\n\nTotal submissions: ${submissions.length}`
+  //               : "No submissions found for this assignment in this section.",
+  //           },
+  //         ],
+  //       };
+  //     } catch (error: any) {
+  //       if (error instanceof Error) {
+  //         throw new Error(`Failed to fetch section submissions: ${error.message}`);
+  //       }
+  //       throw new Error('Failed to fetch section submissions: Unknown error');
+  //     }
+  //   }
+  // );
 } 

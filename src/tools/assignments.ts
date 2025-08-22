@@ -129,103 +129,103 @@ export function registerAssignmentTools(server: any, canvas: CanvasClient) {
   );
 
   // Tool: create-assignment
-  server.tool(
-    "create-assignment",
-    "Create a new assignment in a course. All fields are optional except courseId.",
-    {
-      courseId: z.string().describe("The ID of the course"),
-      name: z.string().optional(),
-      description: z.string().optional(),
-      due_at: z.string().optional(),
-      points_possible: z.number().optional(),
-      submission_types: z.array(z.string()).optional(),
-      published: z.boolean().optional(),
-      grading_type: z.string().optional(),
-      assignment_group_id: z.number().optional(),
-    },
-    async (args: any) => {
-      const { courseId, ...fields } = args;
-      try {
-        const response = await canvas.createAssignment(courseId, { assignment: fields });
-        return {
-          content: [
-            {
-              type: "text",
-              text: JSON.stringify(response, null, 2)
-            }
-          ]
-        };
-      } catch (error: any) {
-        if (error instanceof Error) {
-          throw new Error(`Failed to create assignment: ${error.message}`);
-        }
-        throw new Error('Failed to create assignment: Unknown error');
-      }
-    }
-  );
+  // server.tool(
+  //   "create-assignment",
+  //   "Create a new assignment in a course. All fields are optional except courseId.",
+  //   {
+  //     courseId: z.string().describe("The ID of the course"),
+  //     name: z.string().optional(),
+  //     description: z.string().optional(),
+  //     due_at: z.string().optional(),
+  //     points_possible: z.number().optional(),
+  //     submission_types: z.array(z.string()).optional(),
+  //     published: z.boolean().optional(),
+  //     grading_type: z.string().optional(),
+  //     assignment_group_id: z.number().optional(),
+  //   },
+  //   async (args: any) => {
+  //     const { courseId, ...fields } = args;
+  //     try {
+  //       const response = await canvas.createAssignment(courseId, { assignment: fields });
+  //       return {
+  //         content: [
+  //           {
+  //             type: "text",
+  //             text: JSON.stringify(response, null, 2)
+  //           }
+  //         ]
+  //       };
+  //     } catch (error: any) {
+  //       if (error instanceof Error) {
+  //         throw new Error(`Failed to create assignment: ${error.message}`);
+  //       }
+  //       throw new Error('Failed to create assignment: Unknown error');
+  //     }
+  //   }
+  // );
 
   // Tool: update-assignment
-  server.tool(
-    "update-assignment",
-    "Update an assignment. All fields are optional except courseId and assignmentId.",
-    {
-      courseId: z.string().describe("The ID of the course"),
-      assignmentId: z.string().describe("The ID of the assignment"),
-      name: z.string().optional(),
-      description: z.string().optional(),
-      due_at: z.string().optional(),
-      points_possible: z.number().optional(),
-      submission_types: z.array(z.string()).optional(),
-      published: z.boolean().optional(),
-      grading_type: z.string().optional(),
-      assignment_group_id: z.number().optional(),
-    },
-    async (args: any) => {
-      const { courseId, assignmentId, ...fields } = args;
-      try {
-        const response = await canvas.updateAssignment(courseId, assignmentId, { assignment: fields });
-        return {
-          content: [
-            {
-              type: "text",
-              text: JSON.stringify(response, null, 2)
-            }
-          ]
-        };
-      } catch (error: any) {
-        if (error instanceof Error) {
-          throw new Error(`Failed to update assignment: ${error.message}`);
-        }
-        throw new Error('Failed to update assignment: Unknown error');
-      }
-    }
-  );
+  // server.tool(
+  //   "update-assignment",
+  //   "Update an assignment. All fields are optional except courseId and assignmentId.",
+  //   {
+  //     courseId: z.string().describe("The ID of the course"),
+  //     assignmentId: z.string().describe("The ID of the assignment"),
+  //     name: z.string().optional(),
+  //     description: z.string().optional(),
+  //     due_at: z.string().optional(),
+  //     points_possible: z.number().optional(),
+  //     submission_types: z.array(z.string()).optional(),
+  //     published: z.boolean().optional(),
+  //     grading_type: z.string().optional(),
+  //     assignment_group_id: z.number().optional(),
+  //   },
+  //   async (args: any) => {
+  //     const { courseId, assignmentId, ...fields } = args;
+  //     try {
+  //       const response = await canvas.updateAssignment(courseId, assignmentId, { assignment: fields });
+  //       return {
+  //         content: [
+  //           {
+  //             type: "text",
+  //             text: JSON.stringify(response, null, 2)
+  //           }
+  //         ]
+  //       };
+  //     } catch (error: any) {
+  //       if (error instanceof Error) {
+  //         throw new Error(`Failed to update assignment: ${error.message}`);
+  //       }
+  //       throw new Error('Failed to update assignment: Unknown error');
+  //     }
+  //   }
+  // );
 
   // Tool: delete-assignment
-  server.tool(
-    "delete-assignment",
-    "Delete (archive) an assignment from a course.",
-    {
-      courseId: z.string().describe("The ID of the course"),
-      assignmentId: z.string().describe("The ID of the assignment")
-    },
-    async ({ courseId, assignmentId }: { courseId: string; assignmentId: string }) => {
-      try {
-        const response = await canvas.delete(`/api/v1/courses/${courseId}/assignments/${assignmentId}`);
-        return {
-          content: [
-            {
-              type: "text",
-              text: JSON.stringify(response, null, 2)
-            }
-          ]
-        };
-      } catch (error: any) {
-        if (error instanceof Error) {
-          throw new Error(`Failed to delete assignment: ${error.message}`);
-        }
-        throw new Error('Failed to delete assignment: Unknown error');
-      }
-    }
-  );
+  // server.tool(
+  //   "delete-assignment",
+  //   "Delete (archive) an assignment from a course.",
+  //   {
+  //     courseId: z.string().describe("The ID of the course"),
+  //     assignmentId: z.string().describe("The ID of the assignment")
+  //   },
+  //   async ({ courseId, assignmentId }: { courseId: string; assignmentId: string }) => {
+  //     try {
+  //       const response = await canvas.delete(`/api/v1/courses/${courseId}/assignments/${assignmentId}`);
+  //       return {
+  //         content: [
+  //           {
+  //             type: "text",
+  //             text: JSON.stringify(response, null, 2)
+  //           }
+  //         ]
+  //       };
+  //     } catch (error: any) {
+  //       if (error instanceof Error) {
+  //         throw new Error(`Failed to delete assignment: ${error.message}`);
+  //       }
+  //       throw new Error('Failed to delete assignment: Unknown error');
+  //     }
+  //   }
+  // );
 } 

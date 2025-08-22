@@ -107,32 +107,32 @@ export function registerModuleTools(server: any, canvas: CanvasClient) {
   );
 
   // Tool: toggle-module-publish
-  server.tool(
-    "toggle-module-publish",
-    "Publish/unpublish a module (toggles the current published state).",
-    {
-      courseId: z.string().describe("The ID of the course"),
-      moduleId: z.string().describe("The ID of the module")
-    },
-    async ({ courseId, moduleId }: { courseId: string; moduleId: string }) => {
-      try {
-        const current = (await canvas.getModule(courseId, moduleId) as any);
-        const newPublished = !current.published;
-        await canvas.updateModulePublish(courseId, moduleId, { published: newPublished });
-        return {
-          content: [
-            {
-              type: "text",
-              text: `Module ${moduleId} in course ${courseId} is now ${newPublished ? 'published' : 'unpublished'}.`
-            }
-          ]
-        };
-      } catch (error: any) {
-        if (error instanceof Error) {
-          throw new Error(`Failed to toggle module publish: ${error.message}`);
-        }
-        throw new Error('Failed to toggle module publish: Unknown error');
-      }
-    }
-  );
+  // server.tool(
+  //   "toggle-module-publish",
+  //   "Publish/unpublish a module (toggles the current published state).",
+  //   {
+  //     courseId: z.string().describe("The ID of the course"),
+  //     moduleId: z.string().describe("The ID of the module")
+  //   },
+  //   async ({ courseId, moduleId }: { courseId: string; moduleId: string }) => {
+  //     try {
+  //       const current = (await canvas.getModule(courseId, moduleId) as any);
+  //       const newPublished = !current.published;
+  //       await canvas.updateModulePublish(courseId, moduleId, { published: newPublished });
+  //       return {
+  //         content: [
+  //           {
+  //             type: "text",
+  //             text: `Module ${moduleId} in course ${courseId} is now ${newPublished ? 'published' : 'unpublished'}.`
+  //           }
+  //         ]
+  //       };
+  //     } catch (error: any) {
+  //       if (error instanceof Error) {
+  //         throw new Error(`Failed to toggle module publish: ${error.message}`);
+  //       }
+  //       throw new Error('Failed to toggle module publish: Unknown error');
+  //     }
+  //   }
+  // );
 } 

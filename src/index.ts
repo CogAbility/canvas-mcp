@@ -48,7 +48,7 @@ registerAssignmentGroupTools(server, canvas);
 registerModuleTools(server, canvas);
 registerPageTools(server, canvas);
 registerSectionTools(server, canvas);
-registerSubmissionTools(server, canvas);
+// registerSubmissionTools(server, canvas);
 registerRubricTools(server, canvas);
 registerPrompts(server, canvas);
 // Start the server
